@@ -52,7 +52,10 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a backing image.'), DOCS.backingImage),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete('backingimages', name))),
+    async ({ name }, client) => {
+      await client.delete('backingimages', name);
+      return textResult(`Deleted backing image "${name}".`);
+    },
   ),
   defineTool(
     'backingimage_cleanup',
@@ -130,7 +133,10 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a backup backing image from the backup target.'), DOCS.backingImage),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete('backupbackingimages', name))),
+    async ({ name }, client) => {
+      await client.delete('backupbackingimages', name);
+      return textResult(`Deleted backup backing image "${name}".`);
+    },
   ),
   defineTool(
     'backupbackingimage_restore',

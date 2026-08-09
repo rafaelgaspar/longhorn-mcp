@@ -72,7 +72,10 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a backup volume record from the backup target.'), DOCS.backupAndRestore),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete('backupvolumes', name))),
+    async ({ name }, client) => {
+      await client.delete('backupvolumes', name);
+      return textResult(`Deleted backup volume "${name}".`);
+    },
   ),
   defineTool(
     'backupvolume_backup_delete',
@@ -187,7 +190,10 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a backup target.'), DOCS.backupAndRestore),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete('backuptargets', name))),
+    async ({ name }, client) => {
+      await client.delete('backuptargets', name);
+      return textResult(`Deleted backup target "${name}".`);
+    },
   ),
   defineTool(
     'backuptarget_sync',

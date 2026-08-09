@@ -103,7 +103,10 @@ export const tools: ToolDef[] = [
     'volume_delete',
     true,
     { title: 'Delete volume', description: withDocs(destructive('Delete a Longhorn volume.'), DOCS.volumes), inputSchema: z.object({ name: z.string() }) },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete(RESOURCE, name))),
+    async ({ name }, client) => {
+      await client.delete(RESOURCE, name);
+      return textResult(`Deleted volume "${name}".`);
+    },
   ),
 
   defineTool(

@@ -24,6 +24,12 @@ export function textResult(text: string): ToolResult {
 }
 
 export function jsonResult(data: unknown): ToolResult {
+  // JSON.stringify(undefined) returns the *value* undefined, not a string —
+  // TypeScript's lib.d.ts types JSON.stringify as always returning `string`,
+  // which is inaccurate for undefined/functions/symbols, so tsc won't catch
+  // this. Longhorn's DELETE responses in particular can have an empty body,
+  // which LonghornClient.request() surfaces as `undefined`.
+  if (data === undefined) return textResult('(empty response body)');
   return textResult(JSON.stringify(data, null, 2));
 }
 

@@ -36,7 +36,10 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a Longhorn engine image.'), DOCS.upgrade),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete('engineimages', name))),
+    async ({ name }, client) => {
+      await client.delete('engineimages', name);
+      return textResult(`Deleted engine image "${name}".`);
+    },
   ),
 
   defineTool(

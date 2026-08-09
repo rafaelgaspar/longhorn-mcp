@@ -72,6 +72,9 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a Longhorn recurring job.'), DOCS.recurringJobs),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete(RESOURCE, name))),
+    async ({ name }, client) => {
+      await client.delete(RESOURCE, name);
+      return textResult(`Deleted recurring job "${name}".`);
+    },
   ),
 ];

@@ -79,7 +79,10 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a Longhorn system backup.'), DOCS.systemBackupRestore),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete('systembackups', name))),
+    async ({ name }, client) => {
+      await client.delete('systembackups', name);
+      return textResult(`Deleted system backup "${name}".`);
+    },
   ),
 
   defineTool(
@@ -116,7 +119,10 @@ export const tools: ToolDef[] = [
       description: withDocs(destructive('Delete a Longhorn system restore record.'), DOCS.systemBackupRestore),
       inputSchema: z.object({ name: z.string() }),
     },
-    async ({ name }, client) => textResult(JSON.stringify(await client.delete('systemrestores', name))),
+    async ({ name }, client) => {
+      await client.delete('systemrestores', name);
+      return textResult(`Deleted system restore "${name}".`);
+    },
   ),
 
   defineTool(

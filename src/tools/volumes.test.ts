@@ -67,3 +67,19 @@ test('volume_delete propagates a client error as an isError result instead of th
   assert.equal(result.isError, true);
   assert.match(result.content[0].text, /volume is still attached/);
 });
+
+test('volume_delete succeeds cleanly when Longhorn returns an empty DELETE response body', async () => {
+  // Verified live: Longhorn's DELETE /v1/volumes/{name} can return an empty
+  // body, which LonghornClient.request() surfaces as `undefined` — this
+  // used to break the tool's result (see tool-def.test.ts) because the
+  // handler did textResult(JSON.stringify(undefined)), and
+  // JSON.stringify(undefined) is the value undefined, not a string.
+  const client = { delete: async () => undefined } as unknown as LonghornClient;
+
+  const handler = captureHandler('volume_delete', client);
+  const result = await handler({ name: 'my-volume' });
+
+  assert.equal(result.isError, undefined);
+  assert.equal(typeof result.content[0].text, 'string');
+  assert.match(result.content[0].text, /Deleted volume "my-volume"/);
+});
