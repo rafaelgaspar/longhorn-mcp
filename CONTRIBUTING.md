@@ -44,6 +44,7 @@ Releases are cut by pushing a `vX.Y.Z` tag from `main` (matching `package.json`'
 - Builds and pushes the multi-arch Docker image to `ghcr.io/rafaelgaspar/longhorn-mcp`.
 - Packages the Helm chart, attaches it to the image manifest (`oras attach`), and pushes it as a standalone tagged artifact to `oci://ghcr.io/rafaelgaspar/longhorn-mcp/charts`.
 - Publishes to npm (`npm publish --access public`).
+- Publishes `server.json` to the [official MCP Registry](https://registry.modelcontextprotocol.io) (`io.github.rafaelgaspar/longhorn-mcp`), which is what surfaces this server in the GitHub MCP Registry too. Authenticates via GitHub Actions OIDC (`mcp-publisher login github-oidc`) — no stored secret. Runs after the `npm` job, since the registry validates that the npm package it points at already exists.
 
 Contributors don't need to do any of this — only a maintainer pushing a release tag triggers it.
 

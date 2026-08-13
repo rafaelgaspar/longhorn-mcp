@@ -136,3 +136,36 @@ jobs:
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  mcp-registry:
+    name: Publish to MCP Registry
+    # The registry validates that the npm package it points at actually exists.
+    needs: npm
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # GitHub OIDC — no stored credential needed
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Resolve version
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Set version in server.json
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          jq --arg v "$VERSION" '.version = $v | .packages[0].version = $v' server.json > server.tmp
+          mv server.tmp server.json
+
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Authenticate to MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish server to MCP Registry
+        run: ./mcp-publisher publish

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.rafaelgaspar/longhorn-mcp",
+  "description": "MCP server for the Longhorn distributed storage manager API, with a --read-only mode.",
+  "repository": {
+    "url": "https://github.com/rafaelgaspar/longhorn-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "longhorn-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "runtimeArguments": [
+        {
+          "type": "named",
+          "name": "--longhorn-url",
+          "description": "Base URL of the Longhorn manager API.",
+          "isRequired": false,
+          "format": "string",
+          "default": "http://longhorn-backend.longhorn-system.svc.cluster.local:9500"
+        },
+        {
+          "type": "named",
+          "name": "--read-only",
+          "description": "Register only read tools; the client also refuses any non-GET request.",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}
