@@ -1,8 +1,12 @@
 {
   "name": "longhorn-mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "MCP server for the Longhorn distributed storage manager API",
   "mcpName": "io.github.rafaelgaspar/longhorn-mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafaelgaspar/longhorn-mcp"
+  },
   "type": "module",
   "license": "MIT",
   "bin": {
