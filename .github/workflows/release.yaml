@@ -96,6 +96,8 @@ jobs:
 
       # Attach as an OCI referrer on the image manifest (like unifi-thread-route-updater) —
       # discoverable via `oras discover`/the Referrers API, tied to this exact image digest.
+      # Covers both the `:latest` and `:<version>` image tags automatically since both
+      # point at the same manifest digest — no separate "latest" step needed here.
       - name: Attach chart to image manifest
         env:
           VERSION: ${{ needs.docker.outputs.version }}
@@ -107,11 +109,16 @@ jobs:
 
       # Also push as a standalone, semver-tagged artifact — for Helm versions/tooling
       # that don't support the attach/Referrers convention, and for anyone who wants
-      # to `helm install`/`helm pull` a specific version directly.
+      # to `helm install`/`helm pull` a specific version directly. `helm push` only
+      # tags with Chart.yaml's own version, so alias it to `latest` too (mirrors the
+      # image's own :latest tag) via `oras tag`, which just adds a second tag to the
+      # same manifest — no re-upload.
       - name: Push standalone tagged chart
         env:
           VERSION: ${{ needs.docker.outputs.version }}
-        run: helm push "longhorn-mcp-${VERSION}.tgz" oci://ghcr.io/rafaelgaspar/longhorn-mcp/charts
+        run: |
+          helm push "longhorn-mcp-${VERSION}.tgz" oci://ghcr.io/rafaelgaspar/longhorn-mcp/charts
+          oras tag "ghcr.io/rafaelgaspar/longhorn-mcp/charts/longhorn-mcp:${VERSION}" latest
 
   npm:
     name: Publish to npm
