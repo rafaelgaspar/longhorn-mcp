@@ -78,7 +78,18 @@ Edit `claude_desktop_config.json`:
 
 ### Cursor
 
-Same `mcpServers` shape as Claude Desktop, in `.cursor/mcp.json` (project-scoped) or Cursor's global MCP settings.
+Edit `.cursor/mcp.json` (project-scoped) or `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "longhorn": {
+      "command": "npx",
+      "args": ["-y", "longhorn-mcp", "--longhorn-url=http://localhost:9500"]
+    }
+  }
+}
+```
 
 ### VS Code (Copilot Chat)
 
