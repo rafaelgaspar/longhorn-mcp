@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: ghcr.io/rafaelgaspar/longhorn-mcp
-  tag: ""
+  tag: "@sha256:e88b313b1a6599261ad5e561f686aeacebab9af3f0b324d421ba4a871ce62ffa"
   pullPolicy: IfNotPresent
 
 nameOverride: ""
