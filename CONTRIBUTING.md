@@ -50,7 +50,7 @@ Contributors don't need to do any of this — only a maintainer pushing a releas
 
 ### npm publishing auth
 
-The `npm` job currently authenticates with a classic `NPM_TOKEN` repo secret, because npm's [Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC, no stored token) can only be configured on a package that already exists on the registry — a brand-new package name needs one manual/token-based publish first. Once the package exists, switch to Trusted Publishing (npmjs.com → package settings → Trusted Publisher: org `rafaelgaspar`, repo `longhorn-mcp`, workflow filename `release.yaml`), update the `npm` job to use `permissions: id-token: write` with no token, and delete the `NPM_TOKEN` secret.
+The `npm` job authenticates via [Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (GitHub Actions OIDC) — configured on the package's npmjs.com settings page (Trusted Publisher: org `rafaelgaspar`, repo `longhorn-mcp`, workflow filename `release.yaml`). No stored token. `v0.1.0` was published with a classic `NPM_TOKEN` before Trusted Publishing was set up (npm requires the package to already exist on the registry before you can configure a Trusted Publisher for it) — that secret is no longer used and can be deleted from the repo.
 
 ## Dependency updates
 

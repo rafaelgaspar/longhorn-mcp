@@ -123,6 +123,9 @@ jobs:
   npm:
     name: Publish to npm
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC Trusted Publishing — no NPM_TOKEN needed
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -136,13 +139,15 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # Classic token, not OIDC Trusted Publishing — npm's Trusted Publisher config
-      # lives on the package's own settings page, which can't be configured until
-      # the package exists on the registry. Once v0.1.0 lands, switch to Trusted
-      # Publishing (permissions: id-token: write, no token) and drop NPM_TOKEN.
+      # OIDC Trusted Publishing needs npm CLI >=11.5.1; don't rely on whatever
+      # version node-version:24 happens to bundle.
+      - run: npm install -g npm@12.0.2
+
+      # Trusted Publishing is configured on the package's npmjs.com settings
+      # page (org rafaelgaspar, repo longhorn-mcp, workflow release.yaml) —
+      # npm CLI auto-detects the GitHub Actions OIDC token, no auth step or
+      # secret needed.
       - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   mcp-registry:
     name: Publish to MCP Registry
