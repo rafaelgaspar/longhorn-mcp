@@ -1,0 +1,42 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate for longhorn-mcp — npm dependencies, Dockerfile base image + syntax pin, GitHub Actions pins.",
+  "extends": [
+    "config:best-practices",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":label(renovate)"
+  ],
+  "timezone": "UTC",
+  "dependencyDashboardTitle": "Renovate Dependency Dashboard - longhorn-mcp",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 4am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "All non-major npm dependency updates in one PR; majors stay separate for manual review",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "npm dependencies",
+      "groupSlug": "npm-dependencies"
+    },
+    {
+      "description": "Dockerfile base image + syntax pin updates in one PR",
+      "matchManagers": ["dockerfile"],
+      "groupName": "Dockerfile pins",
+      "groupSlug": "dockerfile-pins"
+    },
+    {
+      "description": "All non-major GitHub Actions updates (tags, digests) in one PR; majors stay separate",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "groupSlug": "github-actions"
+    },
+    {
+      "description": "Automerge non-major updates once CI passes and minimumReleaseAge has elapsed; majors stay manual",
+      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "automerge": true
+    }
+  ]
+}

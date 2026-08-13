@@ -1,0 +1,14 @@
+longhorn-mcp ({{ include "longhorn-mcp.fullname" . }}) has been deployed in namespace {{ .Release.Namespace }}.
+
+{{- if .Values.service.enabled }}
+
+Service: {{ include "longhorn-mcp.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+{{- end }}
+
+{{- if .Values.route.enabled }}
+HTTPRoute enabled for: {{ join ", " .Values.route.hostnames }}
+{{- end }}
+
+See https://github.com/rafaelgaspar/longhorn-mcp for CLI flags (--read-only,
+--longhorn-url, --allowed-hosts, ...) to pass via `args`, and for how to
+point this at your Longhorn manager API.

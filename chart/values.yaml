@@ -1,0 +1,69 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/rafaelgaspar/longhorn-mcp
+  tag: ""
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Set to false to run under the namespace's default ServiceAccount instead.
+  create: true
+  name: ""
+  annotations: {}
+
+# Deployment-level annotations (e.g. reloader.stakater.com/auto).
+annotations: {}
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+# args is required alongside command on some entrypoints/images (the image's
+# ENTRYPOINT is tini, and Kubernetes args replaces CMD entirely rather than
+# appending to it) — see the README's Kubernetes/Helm section.
+command: []
+args:
+  - --http
+env: []
+
+containerPort: 3000
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 30
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 3
+  periodSeconds: 10
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 3000
+  annotations: {}
+
+# Optional, vendor-neutral core Gateway API HTTPRoute (gateway.networking.k8s.io/v1).
+# Off by default — bring your own Gateway and set parentRefs to attach one.
+route:
+  enabled: false
+  # e.g. [{name: my-gateway, namespace: gateway-system}]
+  parentRefs: []
+  hostnames: []
+  path: /
+  pathType: PathPrefix

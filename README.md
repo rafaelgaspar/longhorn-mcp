@@ -1,14 +1,8 @@
 # longhorn-mcp
 
-An MCP server for the [Longhorn](https://longhorn.io) distributed storage manager API. Full read/write coverage of Longhorn's REST API (volumes, snapshots, backups, backing images, nodes, settings, engine images, recurring jobs, and more), a `--read-only` mode, and both stdio and Streamable HTTP transports.
+An MCP server for the [Longhorn](https://longhorn.io) distributed storage manager API. Full read/write coverage of Longhorn's REST API (volumes, snapshots, backups, backing images, nodes, settings, engine images, recurring jobs, and more), a `--read-only` mode, both stdio and Streamable HTTP transports, and an official Helm chart.
 
-> **Not yet published to npm.** This package currently lives inside [k3s-home](https://github.com/rafaelgaspar/k3s-home)'s `lib/node/longhorn-mcp/` and ships as the [`longhorn-mcp` Docker image](../../../images/longhorn-mcp/Dockerfile) built from it — the `npx longhorn-mcp` commands below are the intended interface once it's extracted into its own repo and published. Until then, run it from a checkout of this source instead:
-> ```bash
-> git clone https://github.com/rafaelgaspar/k3s-home && cd k3s-home/lib/node/longhorn-mcp
-> npm ci && npm run build
-> node dist/index.js --longhorn-url=http://<longhorn-manager-host>:9500
-> ```
-> Substitute `node dist/index.js` (with an absolute path, e.g. `node /path/to/k3s-home/lib/node/longhorn-mcp/dist/index.js`) for every `npx -y longhorn-mcp` below.
+> **AI-assisted development.** The majority of this codebase — implementation, tests, and this documentation — was written with AI assistance (Claude). Review accordingly, especially before running write-mode tools against a production Longhorn cluster.
 
 ## Quick start
 
@@ -28,6 +22,34 @@ Longhorn's manager API is **unauthenticated** — reachability is the only acces
 | `--read-only` | off | Register only read tools; the client also refuses any non-GET request. |
 | `--longhorn-url` | `http://longhorn-backend.longhorn-system.svc.cluster.local:9500` | Base URL of the Longhorn manager API. Standard Kubernetes cluster-local DNS by default — a cluster with a custom cluster domain overrides this via `--longhorn-url` in its own Deployment rather than changing this package's default. |
 | `--allowed-hosts` | `localhost,127.0.0.1` | Comma-separated `Host`/`Origin` allowlist for `--http` mode. Must include every hostname/IP:port the server will actually be reached on — see [MCP spec DNS rebinding guidance](https://modelcontextprotocol.io/specification). |
+
+## Deploying with Helm
+
+An official chart is published alongside every release:
+
+```bash
+helm install longhorn-mcp oci://ghcr.io/rafaelgaspar/longhorn-mcp/charts/longhorn-mcp --version 0.1.0 \
+  --set args[0]=--http \
+  --set args[1]=--longhorn-url=http://longhorn-backend.longhorn-system.svc.cluster.local:9500
+```
+
+Key values:
+
+| Value | Default | Notes |
+|---|---|---|
+| `image.repository` / `image.tag` | `ghcr.io/rafaelgaspar/longhorn-mcp` / chart `appVersion` | |
+| `args` | `["--http"]` | Append `--read-only`, `--longhorn-url`, `--allowed-hosts`, etc. — see [CLI reference](#cli-reference). |
+| `service.enabled` / `.type` / `.port` | `true` / `ClusterIP` / `3000` | |
+| `route.enabled` | `false` | Optional, vendor-neutral core Gateway API `HTTPRoute` (`gateway.networking.k8s.io/v1`) — no Envoy Gateway-specific resources. Bring your own `Gateway` and set `route.parentRefs`/`route.hostnames`. |
+| `serviceAccount.create` | `true` | |
+
+Full schema: [`chart/values.yaml`](./chart/values.yaml) / [`chart/values.schema.json`](./chart/values.schema.json).
+
+The chart is also attached as an OCI referrer directly on the image manifest, for tooling that discovers charts via the [OCI Referrers API](https://oras.land/docs/how_to_guides/artifact_referrers/) instead of pulling a separately tagged artifact:
+
+```bash
+oras discover ghcr.io/rafaelgaspar/longhorn-mcp:0.1.0
+```
 
 ## Connecting popular MCP clients
 
@@ -75,7 +97,11 @@ Same `mcpServers` shape as Claude Desktop, in `.cursor/mcp.json` (project-scoped
 
 ### Remote/HTTP
 
-To point a client at an already-running Streamable HTTP instance (e.g. this server deployed in-cluster) instead of spawning a local `npx` process, use that client's remote-MCP configuration with the server's `/mcp` URL. Clients without native remote-HTTP MCP support can bridge via [`mcp-remote`](https://www.npmjs.com/package/mcp-remote).
+To point a client at an already-running Streamable HTTP instance (e.g. this server deployed in-cluster, see [Deploying with Helm](#deploying-with-helm)) instead of spawning a local `npx` process, use that client's remote-MCP configuration with the server's `/mcp` URL. Clients without native remote-HTTP MCP support can bridge via [`mcp-remote`](https://www.npmjs.com/package/mcp-remote).
+
+### Running behind a gateway
+
+Longhorn's manager API — and by extension this server — has no authentication of its own; reachability is the access control (see [Quick start](#quick-start)). For a multi-tenant or externally-reachable deployment, fronting `--http` mode with an MCP-aware gateway (e.g. [Envoy AI Gateway](https://aigateway.envoyproxy.io/) or similar) for auth, rate limiting, and routing is a good idea. It's not required, though — a private network boundary (VPN, SSH tunnel, cluster-internal only) is a perfectly reasonable standalone posture too, and is exactly what the Helm chart defaults to (`route.enabled: false`, no external exposure).
 
 ## Destructive-action guardrails
 
@@ -122,6 +148,10 @@ npm run build
 npm run introspect-schema -- http://localhost:9500
 npm run introspect-schema -- http://localhost:9500 volume   # one resource type in full
 ```
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for dev setup, coding conventions, and how releases work.
 
 ## License
 
