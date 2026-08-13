@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Renovate for longhorn-mcp — npm dependencies, Dockerfile base image + syntax pin, GitHub Actions pins.",
+  "description": "Renovate for longhorn-mcp — npm dependencies, Dockerfile base image + syntax pin, GitHub Actions pins. Excludes the project's own published image (ghcr.io/rafaelgaspar/longhorn-mcp), which is versioned by the release pipeline, not Renovate.",
   "extends": [
     "config:best-practices",
     ":semanticCommits",
@@ -9,6 +9,7 @@
   ],
   "timezone": "UTC",
   "dependencyDashboardTitle": "Renovate Dependency Dashboard - longhorn-mcp",
+  "ignoreDeps": ["ghcr.io/rafaelgaspar/longhorn-mcp"],
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 4am on monday"]
