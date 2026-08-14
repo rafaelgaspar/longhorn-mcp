@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Typecheck & test
@@ -68,12 +71,21 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # scanners: vuln only — secret scanning is already covered by gitleaks.yaml,
+      # and misconfig scanning here would flag this repo's own workflow files
+      # (unrelated to what's actually inside the image). ignore-unfixed +
+      # severity drop the large volume of low/unfixed Debian base-image CVEs
+      # that Renovate/apt-get upgrade can't do anything about, so what lands
+      # in the Security tab is limited to real, actionable HIGH/CRITICAL findings.
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
         with:
           image-ref: ghcr.io/rafaelgaspar/longhorn-mcp:sha-${{ github.sha }}
           format: 'sarif'
           output: 'trivy-results.sarif'
+          scanners: 'vuln'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: 'true'
           exit-code: '0'
 
       - name: Upload Trivy scan results to GitHub Security tab

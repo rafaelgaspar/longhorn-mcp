@@ -12,7 +12,10 @@ FROM node:24-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba3275657f935954
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" \
   && apt-get install -y --no-install-recommends tini \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  # Runtime never invokes npm/npx — drop them so their bundled deps
+  # (undici, tar, etc.) don't show up as vulnerabilities in this image.
+  && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /app
 COPY --from=build /app/dist ./dist
