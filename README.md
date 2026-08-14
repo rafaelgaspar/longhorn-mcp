@@ -124,7 +124,7 @@ This is advisory, not enforced — a client or model can ignore it. It reduces t
 
 ## Longhorn documentation links
 
-Most tool descriptions end with a `Longhorn docs: <url>` link to the relevant page in [Longhorn's official documentation](https://longhorn.io/docs/), pinned to the Longhorn version this server's default `--longhorn-url` target runs (currently 1.12.0) rather than "latest," so the linked content matches the API version actually in use. A handful of tools with no clearly corresponding doc page (`instancemanager_*`, `volumeattachment_*`, `longhorn_events`, the `longhorn_raw_request`/`longhorn_list_resource_types`/`longhorn_describe_resource_type` introspection tools) don't have one.
+Most tool descriptions end with a `Longhorn docs: <url>` link to the relevant page in [Longhorn's official documentation](https://longhorn.io/docs/), pinned to the Longhorn version this server's default `--longhorn-url` target runs (currently 1.12.1) rather than "latest," so the linked content matches the API version actually in use. A handful of tools with no clearly corresponding doc page (`instancemanager_*`, `volumeattachment_*`, `longhorn_events`, the `longhorn_raw_request`/`longhorn_list_resource_types`/`longhorn_describe_resource_type` introspection tools) don't have one.
 
 ## Read-only mode
 
