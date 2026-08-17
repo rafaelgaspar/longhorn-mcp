@@ -78,7 +78,7 @@ jobs:
       # that Renovate/apt-get upgrade can't do anything about, so what lands
       # in the Security tab is limited to real, actionable HIGH/CRITICAL findings.
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@c07df6fec6fa692e6fd1200d50aaa1fdd66f03c8 # master
+        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
         with:
           image-ref: ghcr.io/rafaelgaspar/longhorn-mcp:sha-${{ github.sha }}
           format: 'sarif'
@@ -89,7 +89,7 @@ jobs:
           exit-code: '0'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4
+        uses: github/codeql-action/upload-sarif@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
