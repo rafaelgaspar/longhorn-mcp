@@ -1,6 +1,7 @@
 import * as z from 'zod/v4';
 import { DOCS } from '../longhorn/docs.js';
 import { defineTool, destructive, jsonResult, textResult, withDocs, type ToolDef } from './tool-def.js';
+import { VOLUME_SETTINGS, VOLUME_SETTING_ACTION } from './volume-settings.js';
 
 const RESOURCE = 'volumes';
 
@@ -8,57 +9,6 @@ const extraField = z
   .record(z.string(), z.unknown())
   .optional()
   .describe('Additional Longhorn fields not covered by the named parameters above, merged verbatim into the request body.');
-
-/**
- * Longhorn's ~19 single-field `update*`/`offlineReplicaRebuilding` volume
- * actions all share the same POST-action/single-field shape (verified against
- * the live cluster's /v1/schemas — see e.g. UpdateReplicaCountInput,
- * UpdateDataLocalityInput, UpdateOfflineRebuildingInput). Consolidated here
- * into one parameterized tool instead of ~19 near-identical ones.
- */
-const VOLUME_SETTINGS: Record<string, string> = {
-  replicaCount: 'replicaCount',
-  replicaAutoBalance: 'replicaAutoBalance',
-  rebuildConcurrentSyncLimit: 'rebuildConcurrentSyncLimit',
-  dataLocality: 'dataLocality',
-  accessMode: 'accessMode',
-  snapshotDataIntegrity: 'snapshotDataIntegrity',
-  snapshotMaxCount: 'snapshotMaxCount',
-  snapshotMaxSize: 'snapshotMaxSize',
-  replicaRebuildingBandwidthLimit: 'replicaRebuildingBandwidthLimit',
-  ublkQueueDepth: 'ublkQueueDepth',
-  ublkNumberOfQueue: 'ublkNumberOfQueue',
-  backupCompressionMethod: 'backupCompressionMethod',
-  unmapMarkSnapChainRemoved: 'unmapMarkSnapChainRemoved',
-  replicaSoftAntiAffinity: 'replicaSoftAntiAffinity',
-  replicaZoneSoftAntiAffinity: 'replicaZoneSoftAntiAffinity',
-  replicaDiskSoftAntiAffinity: 'replicaDiskSoftAntiAffinity',
-  freezeFilesystemForSnapshot: 'freezeFilesystemForSnapshot',
-  backupTargetName: 'backupTargetName',
-  offlineReplicaRebuilding: 'offlineRebuilding',
-};
-
-const VOLUME_SETTING_ACTION: Record<string, string> = {
-  replicaCount: 'updateReplicaCount',
-  replicaAutoBalance: 'updateReplicaAutoBalance',
-  rebuildConcurrentSyncLimit: 'updateRebuildConcurrentSyncLimit',
-  dataLocality: 'updateDataLocality',
-  accessMode: 'updateAccessMode',
-  snapshotDataIntegrity: 'updateSnapshotDataIntegrity',
-  snapshotMaxCount: 'updateSnapshotMaxCount',
-  snapshotMaxSize: 'updateSnapshotMaxSize',
-  replicaRebuildingBandwidthLimit: 'updateReplicaRebuildingBandwidthLimit',
-  ublkQueueDepth: 'updateUblkQueueDepth',
-  ublkNumberOfQueue: 'updateUblkNumberOfQueue',
-  backupCompressionMethod: 'updateBackupCompressionMethod',
-  unmapMarkSnapChainRemoved: 'updateUnmapMarkSnapChainRemoved',
-  replicaSoftAntiAffinity: 'updateReplicaSoftAntiAffinity',
-  replicaZoneSoftAntiAffinity: 'updateReplicaZoneSoftAntiAffinity',
-  replicaDiskSoftAntiAffinity: 'updateReplicaDiskSoftAntiAffinity',
-  freezeFilesystemForSnapshot: 'updateFreezeFilesystemForSnapshot',
-  backupTargetName: 'updateBackupTargetName',
-  offlineReplicaRebuilding: 'offlineReplicaRebuilding',
-};
 
 export const tools: ToolDef[] = [
   defineTool(
@@ -224,6 +174,18 @@ export const tools: ToolDef[] = [
       inputSchema: z.object({ name: z.string() }),
     },
     async ({ name }, client) => jsonResult(await client.action(RESOURCE, name, 'trimFilesystem')),
+  ),
+
+  defineTool(
+    'volume_job_list',
+    true,
+    {
+      title: 'List volume jobs',
+      description:
+        'List a volume\'s background async jobs via its "jobList" action. Longhorn does not publish a dedicated input or output schema for this action in /v1/schemas, and it has no corresponding docs page — use longhorn_describe_resource_type(\'volume\') to check the deployed version\'s exact shape, or pass fields via extra.',
+      inputSchema: z.object({ name: z.string(), extra: extraField }),
+    },
+    async ({ name, extra }, client) => jsonResult(await client.action(RESOURCE, name, 'jobList', extra)),
   ),
 
   defineTool(

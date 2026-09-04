@@ -124,7 +124,29 @@ This is advisory, not enforced — a client or model can ignore it. It reduces t
 
 ## Longhorn documentation links
 
-Most tool descriptions end with a `Longhorn docs: <url>` link to the relevant page in [Longhorn's official documentation](https://longhorn.io/docs/), pinned to the Longhorn version this server's default `--longhorn-url` target runs (currently 1.12.1) rather than "latest," so the linked content matches the API version actually in use. A handful of tools with no clearly corresponding doc page (`instancemanager_*`, `volumeattachment_*`, `longhorn_events`, the `longhorn_raw_request`/`longhorn_list_resource_types`/`longhorn_describe_resource_type` introspection tools) don't have one.
+Most tool descriptions end with a `Longhorn docs: <url>` link to the relevant page in [Longhorn's official documentation](https://longhorn.io/docs/), pinned to the Longhorn version this server's default `--longhorn-url` target runs (currently 1.12.1) rather than "latest," so the linked content matches the API version actually in use. A handful of tools with no clearly corresponding doc page (`instancemanager_*`, `volumeattachment_*`, `longhorn_events`, `volume_job_list`, the `longhorn_raw_request`/`longhorn_list_resource_types`/`longhorn_describe_resource_type` introspection tools) don't have one.
+
+## Action links
+
+Every Longhorn resource returned by this server (a volume, node, backing image, ...) embeds an `actions` map of the RPC actions currently valid for it, e.g. a volume's `actions.attach`. Longhorn's own API returns these as URLs pointing at the manager's in-cluster address — useless to an MCP client, which can only call tools, not arbitrary HTTP endpoints. This server rewrites each one into the MCP tool that performs it instead, alongside that tool's parameter shape (name -> compact type, `?` suffix for optional) so a client can call it without a separate schema lookup, e.g.:
+
+```json
+"actions": {
+  "attach": {
+    "tool": "volume_attach",
+    "shape": { "name": "string", "hostId": "string", "disableFrontend": "boolean?", "attachedBy": "string?", "attacherType": "string?", "attachmentID": "string?" }
+  },
+  "updateReplicaCount": {
+    "tool": "volume_update_setting",
+    "shape": { "name": "string", "setting": "enum(19 values)", "value": "string|number|boolean" },
+    "args": { "setting": "replicaCount" }
+  }
+}
+```
+
+`args` (as above on `updateReplicaCount`) appears when the action already pins down one of the tool's parameters — Longhorn's ~19 single-field volume `update*` actions all route through the one `volume_update_setting` tool, distinguished only by which `setting` value to pass. `shape` always lists every parameter the tool takes, including ones already pinned via `args`, so a pinned value can always be resolved against `shape` without a separate lookup.
+
+Every action every resource type's schema currently declares maps to a named tool this way — including volume's undocumented `jobList`, via `volume_job_list` (Longhorn publishes no input/output schema for it, so that tool accepts an open-ended `extra` object; see `longhorn_describe_resource_type('volume')` to check the deployed version's exact shape). Any action a future Longhorn version adds that this server hasn't caught up to yet falls back to `longhorn_raw_request` instead, with `args.method`/`args.path` pre-filled from the original URL. Since Longhorn only lists actions currently valid for a resource's state (e.g. `salvage` only appears on a faulted volume), this reflects what's actually callable right now, not just what the tool schema allows.
 
 ## Read-only mode
 
