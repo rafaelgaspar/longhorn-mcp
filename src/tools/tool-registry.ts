@@ -10,6 +10,14 @@ function typeLabel(prop: Record<string, unknown>): string {
   if (Array.isArray(prop.anyOf)) {
     return (prop.anyOf as Record<string, unknown>[]).map(typeLabel).join('|');
   }
+  // A union of primitives (e.g. z.union([z.string(), z.number()])) can come
+  // back as an array-valued `type` (["string", "number"]) rather than
+  // `anyOf` — verified this varies by zod version (4.5.4 emits this form for
+  // volume_update_setting's `value` field; 4.4.3 emitted `anyOf` for the
+  // same schema), so handle both rather than assuming one.
+  if (Array.isArray(prop.type)) {
+    return (prop.type as unknown[]).join('|');
+  }
   if (prop.type === 'array') {
     return `${typeLabel((prop.items ?? {}) as Record<string, unknown>)}[]`;
   }
