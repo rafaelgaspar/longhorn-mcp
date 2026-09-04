@@ -2,8 +2,8 @@ apiVersion: v2
 name: longhorn-mcp
 description: MCP server for the Longhorn distributed storage manager API
 type: application
-version: 0.1.6
-appVersion: "0.1.6"
+version: 0.1.7
+appVersion: "0.1.7"
 home: https://github.com/rafaelgaspar/longhorn-mcp
 sources:
   - https://github.com/rafaelgaspar/longhorn-mcp
