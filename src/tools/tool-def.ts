@@ -1,6 +1,8 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import type * as z from 'zod/v4';
 import type { LonghornClient } from '../longhorn/client.js';
+import { translateActions } from './action-links.js';
+import { defineToolShape } from './tool-registry.js';
 
 /**
  * `write: true` tools are skipped at registration time when the server runs
@@ -30,7 +32,7 @@ export function jsonResult(data: unknown): ToolResult {
   // this. Longhorn's DELETE responses in particular can have an empty body,
   // which LonghornClient.request() surfaces as `undefined`.
   if (data === undefined) return textResult('(empty response body)');
-  return textResult(JSON.stringify(data, null, 2));
+  return textResult(JSON.stringify(translateActions(data), null, 2));
 }
 
 export function errorResult(error: unknown): ToolResult {
@@ -71,6 +73,7 @@ export function defineTool<Shape extends z.ZodRawShape>(
   meta: ToolMeta<Shape>,
   handler: (args: z.infer<z.ZodObject<Shape>>, client: LonghornClient) => Promise<ToolResult>,
 ): ToolDef {
+  defineToolShape(name, meta.inputSchema);
   return {
     name,
     write,
