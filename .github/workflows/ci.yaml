@@ -78,7 +78,7 @@ jobs:
       # that Renovate/apt-get upgrade can't do anything about, so what lands
       # in the Security tab is limited to real, actionable HIGH/CRITICAL findings.
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@d2a0b60797ff03db6132bd4e2b293f9b37081297 # master
+        uses: aquasecurity/trivy-action@c03d123cb480c08c69b054af418ea5e69fe6e57e # master
         with:
           image-ref: ghcr.io/rafaelgaspar/longhorn-mcp:sha-${{ github.sha }}
           format: 'sarif'
