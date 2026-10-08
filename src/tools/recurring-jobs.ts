@@ -31,7 +31,19 @@ export const tools: ToolDef[] = [
         name: z.string(),
         task: z.string().describe('e.g. "snapshot", "backup", "snapshot-cleanup", "snapshot-delete", "filesystem-trim", "system-backup".'),
         cron: z.string().describe('Cron schedule expression.'),
-        retain: z.number().int().min(0),
+        retain: z
+          .number()
+          .int()
+          .min(0)
+          .describe('Retention count when retentionPolicy is count-based (the default).'),
+        retentionPolicy: z
+          .enum(['count-based', 'age-based'])
+          .optional()
+          .describe('count-based (default) retains the newest N items; age-based uses retainAge instead.'),
+        retainAge: z
+          .string()
+          .optional()
+          .describe('Go duration such as "720h" — required when retentionPolicy is age-based (Longhorn 1.13.0+).'),
         concurrency: z.number().int().min(1),
         groups: z.array(z.string()).optional(),
         labels: z.record(z.string(), z.string()).optional(),
@@ -56,6 +68,8 @@ export const tools: ToolDef[] = [
         task: z.string().optional(),
         cron: z.string().optional(),
         retain: z.number().int().min(0).optional(),
+        retentionPolicy: z.enum(['count-based', 'age-based']).optional(),
+        retainAge: z.string().optional(),
         concurrency: z.number().int().min(1).optional(),
         groups: z.array(z.string()).optional(),
         labels: z.record(z.string(), z.string()).optional(),

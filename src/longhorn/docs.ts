@@ -1,12 +1,12 @@
 /**
  * Longhorn documentation links surfaced in tool descriptions. Pinned to
- * 1.12.1 (the version this cluster runs — see namespaces/longhorn-system/
+ * 1.13.0 (the version this cluster runs — see namespaces/longhorn-system/
  * longhorn-helmrelease.yaml) rather than "latest", so the linked content
  * matches the API this server actually talks to. Bump alongside that chart
  * version; each URL was verified to resolve to real, on-topic Longhorn docs
- * as of 2026-08.
+ * as of 2026-10.
  */
-const BASE = 'https://longhorn.io/docs/1.12.1';
+const BASE = 'https://longhorn.io/docs/1.13.0';
 
 export const DOCS = {
   volumes: `${BASE}/nodes-and-volumes/volumes/create-volumes/`,
@@ -21,5 +21,6 @@ export const DOCS = {
   settings: `${BASE}/references/settings/`,
   upgrade: `${BASE}/deploy/upgrade/`,
   supportBundle: `${BASE}/troubleshoot/support-bundle/`,
-  sharding: `${BASE}/advanced-resources/v2-data-engine/sharding/`,
+  sharding: `${BASE}/advanced-resources/sharding-storage/`,
+  snapshotGroups: `${BASE}/snapshots-and-backups/csi-snapshot-support/csi-volume-group-snapshot/`,
 } as const;

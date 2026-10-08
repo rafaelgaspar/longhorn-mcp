@@ -13,7 +13,7 @@ import { VOLUME_SETTING_ACTION } from './volume-settings.js';
  * this server*, not a URL it has no way to reach.
  *
  * Built from each type's `resourceActions` in GET /v1/schemas/{type},
- * cross-checked against a live 1.12.1 cluster — of every resource type this
+ * cross-checked against a live 1.13.0 cluster — of every resource type this
  * server exposes, only these six ever declare custom actions; everything
  * else is plain CRUD (list/get/create/update/delete), which needs no
  * translation since there's no `actions` map to rewrite.
