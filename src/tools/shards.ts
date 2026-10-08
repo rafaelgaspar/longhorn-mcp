@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { DOCS } from '../longhorn/docs.js';
 import { defineTool, jsonResult, withDocs, type ToolDef } from './tool-def.js';
 
-// shard / shardGroup: Longhorn 1.12.1's experimental V2 data engine storage
+// shard / shardGroup: Longhorn 1.13.0's experimental V2 data engine storage
 // sharding (erasure-coded volumes). Both are read-only in Longhorn's v1 API
 // (resourceMethods is GET-only, resourceActions is empty) — they're
 // server-computed status objects describing shard placement/rebuild state,

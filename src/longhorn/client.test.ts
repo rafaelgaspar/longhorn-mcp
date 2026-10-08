@@ -90,6 +90,18 @@ test('updateMerged() fetches the current resource and merges the patch on top be
   assert.deepEqual(result.groups, ['g1']);
 });
 
+test('collectionAction() POSTs to /v1/<resource>?action=<name> on the collection', async (t: TestContext) => {
+  const fetchMock = t.mock.fn(async (_url: string, init?: RequestInit) => jsonResponse(200, { type: 'snapshotGroupPreviewOutput' }));
+  t.mock.method(globalThis, 'fetch', fetchMock);
+
+  const client = new LonghornClient({ baseUrl: 'http://longhorn-backend:9500', readOnly: false });
+  await client.collectionAction('snapshotgroups', 'preview', { volumes: ['vol-a'] });
+
+  const [url, init] = fetchMock.mock.calls[0].arguments;
+  assert.equal(url, 'http://longhorn-backend:9500/v1/snapshotgroups?action=preview');
+  assert.equal(init?.method, 'POST');
+});
+
 test('updateMerged() refuses in read-only mode without ever calling fetch (the merge itself never starts)', async (t: TestContext) => {
   const fetchMock = t.mock.fn(async () => jsonResponse(200, {}));
   t.mock.method(globalThis, 'fetch', fetchMock);

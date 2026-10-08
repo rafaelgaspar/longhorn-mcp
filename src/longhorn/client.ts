@@ -121,6 +121,10 @@ export class LonghornClient {
     return this.request<T>('POST', `/v1/${resource}/${encodeURIComponent(id)}?action=${encodeURIComponent(action)}`, body);
   }
 
+  collectionAction<T = unknown>(resource: string, action: string, body?: unknown): Promise<T> {
+    return this.request<T>('POST', `/v1/${resource}?action=${encodeURIComponent(action)}`, body);
+  }
+
   schemas<T = unknown>(): Promise<T> {
     return this.request<T>('GET', '/v1/schemas');
   }

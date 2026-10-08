@@ -8,6 +8,7 @@ import { tools as rawTools } from './raw.js';
 import { tools as recurringJobTools } from './recurring-jobs.js';
 import { tools as settingTools } from './settings.js';
 import { tools as shardTools } from './shards.js';
+import { tools as snapshotGroupTools } from './snapshot-groups.js';
 import { tools as snapshotTools } from './snapshots.js';
 import { tools as systemTools } from './system.js';
 import type { ToolDef } from './tool-def.js';
@@ -16,6 +17,7 @@ import { tools as volumeTools } from './volumes.js';
 const ALL_TOOLS: ToolDef[] = [
   ...volumeTools,
   ...snapshotTools,
+  ...snapshotGroupTools,
   ...backupTools,
   ...backingImageTools,
   ...nodeTools,
