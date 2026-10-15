@@ -48,11 +48,3 @@ Releases are cut by pushing a `vX.Y.Z` tag from `main` (matching `package.json`'
 - Creates the GitHub Release itself (`softprops/action-gh-release`, auto-generated notes), once the docker/chart/npm/mcp-registry jobs have all succeeded.
 
 Contributors don't need to do any of this — only a maintainer pushing a release tag triggers it.
-
-### npm publishing auth
-
-The `npm` job authenticates via [Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (GitHub Actions OIDC) — configured on the package's npmjs.com settings page (Trusted Publisher: org `rafaelgaspar`, repo `longhorn-mcp`, workflow filename `release.yaml`). No stored token. `v0.1.0` was published with a classic `NPM_TOKEN` before Trusted Publishing was set up (npm requires the package to already exist on the registry before you can configure a Trusted Publisher for it) — that secret is no longer used and can be deleted from the repo.
-
-## Dependency updates
-
-[Renovate](https://docs.renovatebot.com/) is configured via `renovate.json` (npm dependencies, Dockerfile pins, GitHub Actions pins — grouped by non-major/major, no release-age delay, non-majors automerge as soon as CI passes). It runs self-hosted via `.github/workflows/renovate.yaml` (weekday cron + manual dispatch) using [`renovatebot/github-action`](https://github.com/renovatebot/github-action), authenticating as a GitHub App rather than the hosted [Renovate GitHub App](https://github.com/apps/renovate). The workflow mints a short-lived installation token via [`actions/create-github-app-token`](https://github.com/actions/create-github-app-token) from the `RENOVATE_APP_CLIENT_ID` and `RENOVATE_APP_PRIVATE_KEY` repo secrets — a maintainer needs to have created a GitHub App, installed it on this repo, and populated those secrets for the workflow to run.

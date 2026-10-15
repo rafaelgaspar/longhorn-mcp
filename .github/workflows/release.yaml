@@ -124,7 +124,7 @@ jobs:
     name: Publish to npm
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # OIDC Trusted Publishing — no NPM_TOKEN needed
+      id-token: write # OIDC Trusted Publishing — no NPM_TOKEN
       contents: read
     steps:
       - name: Checkout
@@ -143,11 +143,18 @@ jobs:
       # version node-version:24 happens to bundle.
       - run: npm install -g npm@12.0.2
 
-      # Trusted Publishing is configured on the package's npmjs.com settings
-      # page (org rafaelgaspar, repo longhorn-mcp, workflow release.yaml) —
-      # npm CLI auto-detects the GitHub Actions OIDC token, no auth step or
-      # secret needed.
-      - run: npm publish --access public
+      # Trusted Publisher (org rafaelgaspar, repo longhorn-mcp, workflow
+      # release.yaml) may npm publish. The dist-tag is set at publish time.
+      - name: Dist-tag
+        id: dist
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
+            echo "tag=rc" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      - run: npm publish --access public --tag ${{ steps.dist.outputs.tag }}
 
   mcp-registry:
     name: Publish to MCP Registry
@@ -201,6 +208,6 @@ jobs:
         with:
           generate_release_notes: true
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
