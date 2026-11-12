@@ -8,7 +8,9 @@
     ":label(renovate)"
   ],
   "timezone": "UTC",
-  "dependencyDashboardTitle": "Renovate Dependency Dashboard - longhorn-mcp",
+  "dependencyDashboard": {
+    "title": "Renovate Dependency Dashboard - longhorn-mcp"
+  },
   "ignoreDeps": ["ghcr.io/rafaelgaspar/longhorn-mcp"],
   "lockFileMaintenance": {
     "enabled": true,
